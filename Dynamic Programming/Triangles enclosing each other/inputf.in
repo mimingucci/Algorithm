@@ -1,0 +1,1 @@
+Cho n tam giác trên mặt phẳng. Tam giác i bao tam giác j nếu 3 đỉnh của tam giác j đều nằm trong tam giác i (có thể nằm trên cạnh). Hãy tìm dãy tam giác bao nhau có nhiều tam giác nhất. Điều kiện: 1≤n≤1000 và tọa độ các đỉnh của các tam giác thuộc đoạn −106 đến 106.
