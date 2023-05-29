@@ -40,45 +40,44 @@ public class template {
     static PrintWriter pw = new PrintWriter(System.out);
 
 
+    static Vector<Pair<Integer, Integer>>[] adj;
+    static int[] drawn;
+ 
+    static int[] f;
+ 
+    static void solve(int u, int pre){
+        for(var x : adj[u]){
+            if(x.getFirst()==pre){
+                continue;
+            }
+            drawn[x.getFirst()]=x.getSecond();
+            f[x.getFirst()]=f[u]+((x.getSecond()<drawn[u])? 1 : 0);
+            solve(x.getFirst(), u);
+        }
+    }
     public static void main(String[] args) {
         int t=r.nextInt();
         while((t--)>0){
-           int n=r.nextInt();
-           boolean[] drawn=new boolean[n+1];
-           Deque<Pair<Integer, Integer>> dq=new ArrayDeque<>();
-           int cnt=1;
-           for(int i=1; i<n; i++){
-               int x=r.nextInt();
-               int y=r.nextInt();
-               if(x==1 || y==1){
-                   drawn[x]=true;
-                   drawn[y]=true;
-                   continue;
-               }
-               if(drawn[x] || drawn[y]){
-                   drawn[x]=true;
-                   drawn[y]=true;
-                   continue;
-               }
-
-               dq.addLast(new Pair<>(x, y));
-
-           }
-           while(!dq.isEmpty()){
-               ++cnt;
-               Deque<Pair<Integer, Integer>> dqq=new ArrayDeque<>();
-               while(dq.size()>0){
-                   Pair p=dq.pollFirst();
-                   if(drawn[(Integer)p.getFirst()] || drawn[(Integer)p.getSecond()]){
-                       drawn[(Integer)p.getFirst()]=true;
-                       drawn[(Integer)p.getSecond()]=true;
-                   }else{
-                       dqq.addLast(p);
-                   }
-               }
-               dq=dqq;
-           }
-           pw.println(cnt);
+            int n=r.nextInt();
+            drawn=new int[n];
+            drawn[0]=n;
+            f=new int[n];
+            adj=new Vector[n];
+            for(int i=0; i<n; i++)adj[i]=new Vector<>();
+            for(int i=0; i<n-1; i++){
+                int x=r.nextInt();
+                int y=r.nextInt();
+                --x;
+                --y;
+                adj[x].add(new Pair<>(y, i));
+                adj[y].add(new Pair<>(x, i));
+            }
+            solve(0, -1);
+            int ans=0;
+            for(int i=0; i<n; i++){
+                ans=Math.max(ans, f[i]);
+            }
+            pw.println(ans);
         }
         pw.close(); // flushes the output once printing is done
     }
