@@ -23,28 +23,29 @@ def prefix_sum(idx):
 def range_sum(l, r):
     return prefix_sum(r) - prefix_sum(l-1)
 */
-std::vector<int> B1, B2;
-void add(std::vector<int> a, int idx, int value){
-    for(; idx<a.size(); idx+=(idx&(-idx))){
-       a[idx]+=value;
-    }
-}
-void range_add(int l, int r, int value){
-    add(B1, l, value);
-    add(B1, r+1, value);
-    add(B2, l, value*(l-1));
-    add(B2, r+1, -value*r);
-}
-int sum(std::vector<int> a, int idx){
-    int res=0;
-    for(; idx>0; idx-=(idx&(-idx))){
-        res+=a[idx];
-    }
-    return res;
-}
-int prefix_sum(int idx){
-    return sum(B1, idx)*idx-sum(B2, idx);
-}
-int range_sum(int l, int r){
-    return prefix_sum(r)-prefix_sum(l-1);
-}
+# A[] is the original array
+# ft[] is the fenwick tree maintaining the diffs initialized with 0
+update(ft, p, v):
+  for (; p <= N; p += p&(-p))
+    ft[p] += v   
+
+# Add v to A[a...b] 
+update(a, b, v):    
+  update(B1, a, v)  
+  update(B1, b + 1, -v)     
+  update(B2, a, v * (a-1))  
+  update(B2, b + 1, -v * b)      
+
+query(ft, b):   
+  sum = 0   
+  for(; b > 0; b -= b&(-b))
+    sum += ft[b]
+  return sum
+
+# Return sum A[1...b]
+query(b):
+  return query(B1, b) * b - query(B2, b)
+
+# Return sum A[a...b]
+query(a, b):
+  return query(b) - query(a-1)
