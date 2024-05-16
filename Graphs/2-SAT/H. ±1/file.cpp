@@ -1,3 +1,16 @@
+/*
+ * author:  mimingucci
+ * created: [Fri] May 17, 2024 00:04:47
+ */
+#include <bits/stdc++.h>
+using namespace std;
+#define int int64_t
+const int INF = int(1) << 62;
+const int MAXN = 1e6;
+const int MOD = 998244353; // 1e9+7
+
+// link problem: https://codeforces.com/contest/1971/problem/H
+
 struct TwoSat {
     int n;
     vector<vector<int>> adj, adj_t;
@@ -59,3 +72,34 @@ struct TwoSat {
         adj_t[a].push_back(neg_b);
     }
 };
+
+int32_t main() {
+    cin.tie(0)->sync_with_stdio(false);
+    int t;
+    cin >> t;
+    while (t--) {
+        int n;
+        cin >> n;
+        TwoSat ts(n);
+        std::vector<std::vector<int>> g(3, std::vector<int>(n));
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < n; j++) {
+                cin >> g[i][j];
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int z = 0; z < j; z++) {
+                    ts.add_disjunction(abs(g[j][i]) - 1, g[j][i] < 0,
+                                       abs(g[z][i]) - 1, g[z][i] < 0);
+                }
+            }
+        }
+        if (ts.solve_2SAT()) {
+            cout << "YES\n";
+        } else {
+            cout << "NO\n";
+        }
+    }
+    return 0;
+}

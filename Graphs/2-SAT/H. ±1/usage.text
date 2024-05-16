@@ -1,0 +1,6 @@
+In atcoder library, add_clause(int a, bool pa, int b, int pb) 
+// pa and pb signify whether a and b are to be positive
+
+
+Otherwise, add_disjunction(int a, bool na, int b, bool nb)
+// na and nb signify whether a and b are to be negated
