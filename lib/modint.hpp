@@ -2,41 +2,47 @@
 #include <cstdint>
 #include <iosfwd>
 #include <vector>
+#include <type_traits>
 
 // modint.hpp
-// Modular integer arithmetic for prime moduli.
-// Template parameter "MOD" must be a positive integer (e.g., 998244353).
+// Modular integer arithmetic for prime moduli with configurable base type.
+// Template parameters:
+//   T    : integral type to store values (e.g., int32_t, int64_t)
+//   MOD  : modulus value of type T, must satisfy 0 < MOD
 
-template<std::int32_t MOD>
-requires (MOD > 0)
+template<typename T, T MOD>
+requires(std::is_integral_v<T> && MOD > 0)
 struct Mint {
+    static_assert(std::is_integral_v<T>, "T must be an integral type");
     static_assert(MOD > 0, "Modulus must be positive");
-    static constexpr int mod = MOD;
 
-    int v;  // value in [0..mod)
+    using value_type = T;
+    static constexpr T mod = MOD;
+
+    T v;  // value in [0..mod)
 
     // ---- constructors -----------------------------------------------------
     constexpr Mint() noexcept : v(0) {}
-    constexpr Mint(std::int64_t x) noexcept
-        : v(static_cast<int>(((x % MOD) + MOD) % MOD)) {}
+    constexpr Mint(T x) noexcept : v(((x % mod) + mod) % mod) {}
+    constexpr Mint(std::int64_t x) noexcept : v(static_cast<T>(((x % mod) + mod) % mod)) {}
 
     // ---- conversion -------------------------------------------------------
-    [[nodiscard]] constexpr int value() const noexcept { return v; }
-    constexpr explicit operator int() const noexcept { return v; }
+    [[nodiscard]] constexpr T value() const noexcept { return v; }
+    constexpr explicit operator T() const noexcept { return v; }
 
     // ---- in-place arithmetic ----------------------------------------------
     constexpr Mint& operator+=(const Mint& rhs) noexcept {
         v += rhs.v;
-        if (v >= MOD) v -= MOD;
+        if (v >= mod) v -= mod;
         return *this;
     }
     constexpr Mint& operator-=(const Mint& rhs) noexcept {
         v -= rhs.v;
-        if (v < 0) v += MOD;
+        if (v < 0) v += mod;
         return *this;
     }
     constexpr Mint& operator*=(const Mint& rhs) noexcept {
-        v = static_cast<int>((static_cast<std::int64_t>(v) * rhs.v) % MOD);
+        v = static_cast<T>((static_cast<std::int64_t>(v) * rhs.v) % mod);
         return *this;
     }
     constexpr Mint& operator/=(const Mint& rhs) noexcept {
@@ -44,10 +50,10 @@ struct Mint {
     }
 
     // ---- binary operators ----------------------------------------------
-    friend constexpr Mint operator+(Mint lhs, const Mint& rhs) noexcept { return lhs += rhs; }
-    friend constexpr Mint operator-(Mint lhs, const Mint& rhs) noexcept { return lhs -= rhs; }
-    friend constexpr Mint operator*(Mint lhs, const Mint& rhs) noexcept { return lhs *= rhs; }
-    friend constexpr Mint operator/(Mint lhs, const Mint& rhs) noexcept { return lhs /= rhs; }
+    friend constexpr Mint operator+(Mint a, const Mint& b) noexcept { return a += b; }
+    friend constexpr Mint operator-(Mint a, const Mint& b) noexcept { return a -= b; }
+    friend constexpr Mint operator*(Mint a, const Mint& b) noexcept { return a *= b; }
+    friend constexpr Mint operator/(Mint a, const Mint& b) noexcept { return a /= b; }
 
     // ---- comparisons ------------------------------------------------------
     friend constexpr bool operator==(const Mint& a, const Mint& b) noexcept { return a.v == b.v; }
@@ -65,12 +71,14 @@ struct Mint {
         return result;
     }
     [[nodiscard]] constexpr Mint inv() const noexcept {
-        return pow(MOD - 2);
+        return pow(mod - 2);
     }
 };
 
 // ---- factorial / nCr helper ---------------------------------------------
-template<class M>
+// Works with any Mint<T, MOD> type
+
+template<typename M>
 struct Comb {
     std::vector<M> fact;
     std::vector<M> ifact;
